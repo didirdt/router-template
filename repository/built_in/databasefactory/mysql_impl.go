@@ -23,12 +23,20 @@ type mysqlImpl struct {
 }
 
 func (m *mysqlImpl) Connect() (er error) {
-
 	//Mysql Connection String Format : [username[:password]@][protocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
 	//Example : root:123456@tcp(127.0.0.1:3306)/employees?charset=utf8
 	pass := env.GetString(m.prefix + "mysql.password")
 	if pass != "" {
 		pvKey := []byte(app.PrivateKey)
+
+		// var passEnc string
+		// byPass := []byte(pass)
+		// passEnc, er = aes.Encrypt(pvKey, pvKey, byPass)
+		// if er != nil {
+		// 	return er
+		// }
+		// glg.Debug("Encrypted MySQL Password: ", passEnc)
+
 		pass, er = aes.Decrypt(pvKey, pvKey, pass)
 		if er != nil {
 			return er

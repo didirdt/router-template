@@ -7,21 +7,12 @@ import (
 	"router-template/entities/app"
 	"router-template/entities/statuscode"
 	"router-template/usecase"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetEmployeeHandler(ctx *gin.Context) {
-	payload := entities.EmployeeFilter{}
-	id := ctx.Param("id")
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		ctx.String(http.StatusBadRequest, "invalid id")
-		return
-	}
-	payload.Id = int64(idInt)
-
+func CreateEmployeeHandler(ctx *gin.Context) {
+	payload := entities.CreateEmployee{}
 	var er error
 	if ctx.ContentType() == "application/json" {
 		er = ctx.BindJSON(&payload)
@@ -33,13 +24,13 @@ func GetEmployeeHandler(ctx *gin.Context) {
 	}
 
 	ucase := usecase.NewEmployeeUsecase()
-	employee, er := ucase.GetEmployee(payload.Id)
+	employee, er := ucase.CreateEmployee(payload.Name, payload.Address, payload.PhoneNumber)
 	if er != nil {
 		if er == app.ErrDuplicateEntry {
 			ctx.String(statuscode.StatusDuplicate, "Data karyawan sudah tersedia!")
 		} else {
 			delivery.PrintError(er.Error())
-			ctx.String(http.StatusInternalServerError, "internal service error")
+			ctx.String(http.StatusInternalServerError, er.Error())
 		}
 	} else {
 		ctx.JSON(http.StatusOK, employee)

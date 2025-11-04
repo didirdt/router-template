@@ -26,6 +26,8 @@ func RegisterHandler(router *gin.Engine) {
 		c.String(http.StatusOK, "Router Template V0.0.0")
 	})
 	router.GET("/list", handler.GetEmployeListHandler)
-	router.POST("/employee", handler.GetEmployee)
-	router.GET("/employee", handler.GetEmployee)
+	router.POST("/employee", handler.CreateEmployeeHandler)
+	router.GET("/employee/:id", handler.GetEmployeeHandler)
+	router.PUT("/update_employee", handler.UpdateEmployeeHandler)
+	router.DELETE("/delete_employee", handler.DeleteEmployeeHandler)
 }

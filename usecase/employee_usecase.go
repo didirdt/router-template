@@ -9,6 +9,9 @@ import (
 type EmployeeUsecase interface {
 	GetEmployeeList() ([]entities.Employee, error)
 	GetEmployee(id int64) (entities.Employee, error)
+	CreateEmployee(name, address, phone_number string) (entities.Employee, error)
+	UpdateEmployee(id int64, name, address, phone_number string) (entities.Employee, error)
+	DeleteEmployee(id int64) (entities.Employee, error)
 }
 
 func NewEmployeeUsecase() EmployeeUsecase {
@@ -25,8 +28,6 @@ func (e *employeeUsecase) GetEmployeeList() (detail []entities.Employee, er erro
 		return detail, er
 	}
 
-	// ! DO ANOTHER BUSINESS LOGIC HERE
-
 	if len(detail) == 0 {
 		return detail, app.ErrNoRecord
 	}
@@ -38,7 +39,32 @@ func (e *employeeUsecase) GetEmployee(id int64) (employee entities.Employee, er 
 	repo, _ := employeerepo.NewEmployeeRepo()
 	employee, er = repo.GetEmployeeById(id)
 
-	// ! DO ANOTHER BUSINESS LOGIC HERE
+	return
+}
+
+func (e *employeeUsecase) CreateEmployee(name, address, phone_number string) (employee entities.Employee, er error) {
+	repo, _ := employeerepo.NewEmployeeRepo()
+	employee, er = repo.CreateEmployee(name, address, phone_number)
+
+	return
+}
+
+func (e *employeeUsecase) UpdateEmployee(id int64, name, address, phone_number string) (employee entities.Employee, er error) {
+	repo, _ := employeerepo.NewEmployeeRepo()
+	employee, er = repo.UpdateEmployee(id, name, address, phone_number)
+	if er != nil {
+		return employee, er
+	}
+
+	return
+}
+
+func (e *employeeUsecase) DeleteEmployee(id int64) (employee entities.Employee, er error) {
+	repo, _ := employeerepo.NewEmployeeRepo()
+	employee, er = repo.DeleteEmployee(id)
+	if er != nil {
+		return employee, er
+	}
 
 	return
 }

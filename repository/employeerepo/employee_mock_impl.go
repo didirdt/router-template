@@ -33,3 +33,27 @@ func (m mockImpl) GetEmployeeById(id int64) (employee entities.Employee, er erro
 		PhoneNumber: faker.E164PhoneNumber(),
 	}, nil
 }
+
+func (m mockImpl) CreateEmployee(name, address, phone_number string) (employee entities.Employee, er error) {
+	return entities.Employee{
+		Id:          faker.RandomUnixTime(),
+		Name:        name,
+		Address:     address,
+		PhoneNumber: phone_number,
+	}, nil
+}
+
+func (m mockImpl) UpdateEmployee(id int64, name, address, phone_number string) (employee entities.Employee, er error) {
+	return entities.Employee{
+		Id:          id,
+		Name:        name,
+		Address:     address,
+		PhoneNumber: phone_number,
+	}, nil
+}
+
+func (m mockImpl) DeleteEmployee(id int64) (employee entities.Employee, er error) {
+	return entities.Employee{
+		Id: id,
+	}, nil
+}
