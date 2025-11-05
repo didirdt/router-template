@@ -25,7 +25,7 @@ func UpdateEmployeeHandler(ctx *gin.Context) {
 	employee, er := ucase.UpdateEmployee(payload.Id, payload.Name, payload.Address, payload.PhoneNumber)
 	if er != nil {
 		delivery.PrintError(er.Error())
-		ctx.String(http.StatusInternalServerError, "internal service error")
+		ctx.String(http.StatusInternalServerError, er.Error())
 	} else {
 		ctx.JSON(http.StatusOK, employee)
 	}

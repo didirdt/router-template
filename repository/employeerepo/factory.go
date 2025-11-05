@@ -8,12 +8,13 @@ import (
 
 func NewEmployeeRepo() (EmployeeRepo, error) {
 	driverName := os.Getenv("app.database_driver")
-	if driverName == databasefactory.DRIVER_MYSQL {
-		return newEmployeeMysqlImpl(), nil
-	} else if driverName == databasefactory.DRIVER_MOCK {
+
+	switch i := driverName; {
+	case i == databasefactory.DRIVER_MOCK:
 		return newEmployeeMockImpl(), nil
-	} else {
+	case i == databasefactory.DRIVER_MYSQL:
+		return newEmployeeMysqlImpl(), nil
+	default:
 		return nil, errors.New("unimplemented database driver")
 	}
-
 }

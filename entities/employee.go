@@ -1,10 +1,11 @@
 package entities
 
 type Employee struct {
-	Id          int64  `json:"id"`
-	Name        string `json:"name"`
-	Address     string `json:"address"`
-	PhoneNumber string `json:"phone_number"`
+	Id          int64   `json:"id"`
+	Name        string  `json:"name"`
+	Address     string  `json:"address"`
+	PhoneNumber string  `json:"phone_number"`
+	Balance     float64 `json:"balance"`
 }
 
 type EmployeeFilter struct {
@@ -22,8 +23,28 @@ type CreateEmployee struct {
 }
 
 type UpdateEmployee struct {
-	Id          int64  `json:"id" binding:"required"`
-	Name        string `json:"name"`
-	Address     string `json:"address"`
-	PhoneNumber string `json:"phone_number"`
+	Id          int64   `json:"id" binding:"required"`
+	Name        string  `json:"name"`
+	Address     string  `json:"address"`
+	PhoneNumber string  `json:"phone_number"`
+	Balance     float64 `json:"balance"`
+}
+
+type TopupBalance struct {
+	Id      int64   `json:"id" binding:"required"`
+	Balance float64 `json:"balance" binding:"required"`
+	Token   string  `json:"token" binding:"required"`
+}
+
+type SendBalance struct {
+	Id      int64   `json:"id" binding:"required"`
+	ToId    int64   `json:"to_id" binding:"required"`
+	Balance float64 `json:"balance" binding:"required"`
+}
+
+type EmployeeBalance struct {
+	Id      int64   `json:"id"`
+	Name    string  `json:"name"`
+	Balance float64 `json:"balance"`
+	Message string  `json:"message"`
 }

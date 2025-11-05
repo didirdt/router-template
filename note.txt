@@ -1,0 +1,13 @@
+
+# add balance to table employee
+# add salary to table employee
+# update salary
+# Topup Balance
+
+# -- rabbitmq Implementation --
+# send balance 
+# bulk send balance for salary 
+
+
+helper :
+get data param in header -->> ctx.Query("id") 

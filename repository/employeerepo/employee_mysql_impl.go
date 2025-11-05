@@ -21,7 +21,7 @@ type employeeMysqlImpl struct {
 }
 
 func (e *employeeMysqlImpl) GetEmployee() (list []entities.Employee, er error) {
-	rows, er := e.conn.Query("Select id, name, address, phone_number from employee")
+	rows, er := e.conn.Query("Select id, name, address, phone_number, balance from employee")
 	if er != nil {
 		return list, er
 	}
@@ -32,7 +32,7 @@ func (e *employeeMysqlImpl) GetEmployee() (list []entities.Employee, er error) {
 
 	for rows.Next() {
 		var item entities.Employee
-		if er = rows.Scan(&item.Id, &item.Name, &item.Address, &item.PhoneNumber); er != nil {
+		if er = rows.Scan(&item.Id, &item.Name, &item.Address, &item.PhoneNumber, &item.Balance); er != nil {
 			return list, er
 		}
 
@@ -51,10 +51,11 @@ func (e *employeeMysqlImpl) GetEmployeeById(id int64) (employee entities.Employe
 		id,
 		name,
 		address,
-		phone_number 
+		phone_number,
+		balance
 		FROM employee WHERE id=?`, id)
 
-	if er = row.Scan(&employee.Id, &employee.Name, &employee.Address, &employee.PhoneNumber); er != nil {
+	if er = row.Scan(&employee.Id, &employee.Name, &employee.Address, &employee.PhoneNumber, &employee.Balance); er != nil {
 		if er == sql.ErrNoRows {
 			return
 		} else {
@@ -89,8 +90,14 @@ func (e *employeeMysqlImpl) CreateEmployee(name, address, phone_number string) (
 }
 
 func (e *employeeMysqlImpl) UpdateEmployee(id int64, name, address, phone_number string) (employee entities.Employee, er error) {
+	phone_numbers, er := phonenumbers.Parse(phone_number, "ID")
+	formatPhoneNumber := phonenumbers.Format(phone_numbers, phonenumbers.NATIONAL)
+	if er != nil {
+		return employee, errors.New(fmt.Sprint("error while create employee : ", er.Error()))
+	}
+
 	result, er := e.conn.Exec(`UPDATE employee SET name=?, address=?, phone_number=? WHERE id=?`,
-		name, address, phone_number, id)
+		name, address, formatPhoneNumber, id)
 	if result == nil || er != nil {
 		return employee, errors.New(fmt.Sprint("error while update employee : ", er.Error()))
 	}

@@ -30,4 +30,7 @@ func RegisterHandler(router *gin.Engine) {
 	router.GET("/employee/:id", handler.GetEmployeeHandler)
 	router.PUT("/update_employee", handler.UpdateEmployeeHandler)
 	router.DELETE("/delete_employee", handler.DeleteEmployeeHandler)
+
+	router.POST("/topup", handler.TopupBalance)
+	router.POST("/send", handler.SendBalance)
 }

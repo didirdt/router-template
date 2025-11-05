@@ -12,6 +12,7 @@ require (
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-faker/faker/v4 v4.5.0
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/nyaruka/phonenumbers v1.6.6
 	github.com/rabbitmq/amqp091-go v1.10.0
