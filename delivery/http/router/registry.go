@@ -32,5 +32,7 @@ func RegisterHandler(router *gin.Engine) {
 	router.DELETE("/delete_employee", handler.DeleteEmployeeHandler)
 
 	router.POST("/topup", handler.TopupBalance)
-	router.POST("/send", handler.SendBalance)
+	router.POST("/send_balance", handler.SendBalance)
+	router.POST("/send_notif", handler.SendNotif)
+	router.GET("/get_notif/:id", handler.GetNotif)
 }
