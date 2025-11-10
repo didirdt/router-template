@@ -1,6 +1,7 @@
 package notificationrepo
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -8,11 +9,13 @@ import (
 	"router-template/delivery/broker"
 	"router-template/entities"
 	"router-template/repository/built_in/databasefactory"
+	"router-template/repository/built_in/keyvaluefactory"
 	"router-template/repository/employeerepo"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/randyardiansyah25/libpkg/util/env"
+	"github.com/redis/go-redis/v9"
 )
 
 func newNotificationMysqlImpl() NotificationRepo {
@@ -56,44 +59,42 @@ func (e *notificationMysqlImpl) SendNotification(notification entities.SendNotif
 		return notif, err
 	}
 
+	ctx := context.Background()
+	rdb := keyvaluefactory.AppStore.GetStore().(*redis.Client)
+	key := fmt.Sprint("notif_go_", notification.Id, "_", time.Now().Unix())
+	err = rdb.Set(ctx, key, json_notification, 0).Err()
+	if err != nil {
+		notif.Status = "failed"
+		return notif, err
+	}
+
 	notif.Status = "success"
 	return notif, nil
 }
 
 func (e *notificationMysqlImpl) ReceiveNotification(notification entities.SendNotif) (notifications []entities.SendNotifResponse, err error) {
-	// emprepo, _ := employeerepo.NewEmployeeRepo()
-	// employee, err := emprepo.GetEmployeeById(notification.Id)
-	// if err != nil {
-	// 	return []entities.SendNotifResponse{}, errors.New(fmt.Sprint("error while Send notification : ", err.Error()))
-	// }
+	emprepo, _ := employeerepo.NewEmployeeRepo()
+	employee, err := emprepo.GetEmployeeById(notification.Id)
+	if err != nil {
+		return []entities.SendNotifResponse{}, errors.New(fmt.Sprint("error while Send notification : ", err.Error()))
+	}
 
-	// queueName := env.GetString("rabbit.queue_name")
-	// message, _ := broker.BrokerChannel.Consume(
-	// 	queueName,
-	// 	"",
-	// 	false,
-	// 	false,
-	// 	false,
-	// 	false,
-	// 	nil,
-	// )
+	ctx := context.Background()
+	rdb := keyvaluefactory.AppStore.GetStore().(*redis.Client)
 
-	// for msg := range message {
-	// 	var prettyJson bytes.Buffer
-	// 	if er := json.Indent(&prettyJson, msg.Body, "", "    "); er != nil {
-	// 		delivery.PrintErrorf("We got message, it seems the message is not in json format : %s, error : %v\n", string(msg.Body), er)
-	// 		msg.Reject(false)
-	// 	} else {
-	// 		delivery.PrintLogf("A notification message was received :\n%s\n", prettyJson.String())
-	// 		notif := entities.SendNotifResponse{
-	// 			Id:      notification.Id,
-	// 			Name:    employee.Name,
-	// 			Message: string(msg.Body),
-	// 			Status:  "success",
-	// 		}
-	// 		notifications = append(notifications, notif)
-	// 		msg.Ack(false)
-	// 	}
-	// }
+	get_key := fmt.Sprint("notif_go_", employee.Id, "_*")
+	get_notifications := rdb.Keys(ctx, get_key)
+
+	for _, notif := range get_notifications.Val() {
+		get_value := rdb.Get(ctx, notif).Val()
+		err = json.Unmarshal([]byte(get_value), &notification)
+
+		notifications = append(notifications, entities.SendNotifResponse{
+			Id:      notification.Id,
+			Name:    employee.Name,
+			Message: notification.Message,
+			Status:  "success",
+		})
+	}
 	return notifications, err
 }
