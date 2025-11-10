@@ -7,20 +7,26 @@ import (
 	"router-template/entities/app"
 	"router-template/entities/statuscode"
 	"router-template/usecase"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetEmployeeHandler(ctx *gin.Context) {
 	payload := entities.EmployeeFilter{}
-	id := ctx.Param("id")
-	idInt, err := strconv.Atoi(id)
+	payload2 := entities.EmployeeFilter{}
+	payload3 := entities.EmployeeFilter{}
+	payload4 := entities.EmployeeFilter{}
+
+	// idInt, err := strconv.Atoi(id)
+	err := ctx.BindQuery(&payload)
+	err = ctx.BindJSON(&payload2)
+	err = ctx.Bind(&payload3)
+	err = ctx.BindUri(&payload4)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "invalid id")
 		return
 	}
-	payload.Id = int64(idInt)
+	// payload.Id = int64(idInt)
 
 	var er error
 	if ctx.ContentType() == "application/json" {

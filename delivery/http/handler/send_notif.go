@@ -19,7 +19,7 @@ func SendNotif(ctx *gin.Context) {
 		er = ctx.Bind(&payloads)
 	}
 	if er != nil {
-		ctx.String(http.StatusBadRequest, er.Error())
+		ctx.String(http.StatusBadRequest, "Failed Parse Params: "+er.Error())
 	}
 
 	ucase := usecase.NewNotificationUsecase()

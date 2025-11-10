@@ -19,7 +19,7 @@ func TopupBalance(ctx *gin.Context) {
 		er = ctx.Bind(&payload)
 	}
 	if er != nil {
-		ctx.String(http.StatusBadRequest, er.Error())
+		ctx.String(http.StatusBadRequest, "Failed Parse Params: "+er.Error())
 	}
 
 	resultToken, invalidToken := common.CheckToken(payload.Token)

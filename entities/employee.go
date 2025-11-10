@@ -9,7 +9,7 @@ type Employee struct {
 }
 
 type EmployeeFilter struct {
-	Id int64 `form:"id" json:"id"`
+	Id int64 `form:"id" json:"id" uri:"id"`
 }
 
 type GetId struct {
