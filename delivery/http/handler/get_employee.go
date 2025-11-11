@@ -13,30 +13,29 @@ import (
 
 func GetEmployeeHandler(ctx *gin.Context) {
 	payload := entities.EmployeeFilter{}
-	payload2 := entities.EmployeeFilter{}
-	payload3 := entities.EmployeeFilter{}
-	payload4 := entities.EmployeeFilter{}
-
+	// payload2 := entities.EmployeeFilter{}
+	// payload3 := entities.EmployeeFilter{}
+	// payload4 := entities.EmployeeFilter{}
 	// idInt, err := strconv.Atoi(id)
-	err := ctx.BindQuery(&payload)
-	err = ctx.BindJSON(&payload2)
-	err = ctx.Bind(&payload3)
-	err = ctx.BindUri(&payload4)
+
+	err := ctx.BindUri(&payload)
+	// err = ctx.BindJSON(&payload2)
+	// err = ctx.Bind(&payload3)
+	// err = ctx.BindQuery(&payload4)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "invalid id")
 		return
 	}
-	// payload.Id = int64(idInt)
 
-	var er error
-	if ctx.ContentType() == "application/json" {
-		er = ctx.BindJSON(&payload)
-	} else {
-		er = ctx.Bind(&payload)
-	}
-	if er != nil {
-		ctx.String(http.StatusBadRequest, er.Error())
-	}
+	// var er error
+	// if ctx.ContentType() == "application/json" {
+	// 	er = ctx.BindJSON(&payload)
+	// } else {
+	// 	er = ctx.Bind(&payload)
+	// }
+	// if er != nil {
+	// 	ctx.String(http.StatusBadRequest, er.Error())
+	// }
 
 	ucase := usecase.NewEmployeeUsecase()
 	employee, er := ucase.GetEmployee(payload.Id)

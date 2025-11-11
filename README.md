@@ -4,7 +4,7 @@
 go mod edit -go <go version>
 go mod tidy
 ```
-
+<!-- 
 ## BUILD WITH DOCKER
 
 ### BUILD
@@ -37,4 +37,4 @@ GOOS=linux GOARCH=amd64 go build -a -v -tags netgo -ldflags '-w' -o bin/router-t
 
 #FOR WINDOWS
 GOOS=windows GOARCH=amd64 go build -a -v -tags netgo -ldflags '-w' -o bin/router-template.exe
-```
+``` -->
