@@ -16,3 +16,6 @@
 vendor/
 log/
 bin/
+serviceAccountKey.json
+private.key
+gin-bin
