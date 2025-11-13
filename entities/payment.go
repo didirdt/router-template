@@ -28,12 +28,12 @@ func (va *VirtualAccount) GetExpiredDate() string {
 }
 
 type Qris struct {
-	PartnerReferenceNo string             `json:"partner_reference_no"`
+	PartnerReferenceNo string             `json:"partnerReferenceNo"`
 	Amount             QrisAmount         `json:"amount"`
-	MerchantId         string             `json:"merchant_id"`
-	TerminalId         string             `json:"terminal_id"`
-	ValidityPeriod     string             `json:"validity_period"`
-	AdditionalInfo     additionalInfoQris `json:"additional_info"`
+	MerchantId         string             `json:"merchantId"`
+	TerminalId         string             `json:"terminalId"`
+	ValidityPeriod     string             `json:"validityPeriod"`
+	AdditionalInfo     additionalInfoQris `json:"additionalInfo"`
 }
 type QrisAmount struct {
 	Value    string `json:"value"`
@@ -41,8 +41,8 @@ type QrisAmount struct {
 }
 
 type additionalInfoQris struct {
-	PostalCode     string `json:"postal_code"`
-	FeeType        string `json:"fee_type"`
+	PostalCode     string `json:"postalCode"`
+	FeeType        string `json:"feeType"`
 	ValidityPeriod string `json:"validityPeriod"`
 }
 
