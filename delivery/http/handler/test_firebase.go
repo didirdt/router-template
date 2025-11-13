@@ -24,11 +24,13 @@ func TestFirebase(ctx *gin.Context) {
 	err := ctx.BindJSON(&payload)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed Parse Params: "+err.Error())
+		return
 	}
 
 	jsonBytes, err := json.Marshal(payload.Data)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed Parse Params: "+err.Error())
+		return
 	}
 
 	usecase := usecase.NewFirebaseUsecase()

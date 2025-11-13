@@ -37,5 +37,6 @@ func RegisterHandler(router *gin.Engine) {
 	router.GET("/get_notif/:id", handler.GetNotif)
 
 	router.POST("/firebase_test", handler.TestFirebase)
-	router.GET("/doku", handler.TestDoku)
+	router.POST("/pay_with_va", handler.PayWithVa)
+	router.POST("/pay_with_qris", handler.PayWithQris)
 }

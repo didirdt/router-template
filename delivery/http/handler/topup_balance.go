@@ -20,6 +20,7 @@ func TopupBalance(ctx *gin.Context) {
 	}
 	if er != nil {
 		ctx.String(http.StatusBadRequest, "Failed Parse Params: "+er.Error())
+		return
 	}
 
 	resultToken, invalidToken := common.CheckToken(payload.Token)
@@ -29,12 +30,13 @@ func TopupBalance(ctx *gin.Context) {
 			delivery.PrintError(er.Error())
 			ctx.String(http.StatusInternalServerError, "Token gagal digenerate")
 			return
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message":   resultToken,
+				"new_token": token,
+			})
+			return
 		}
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message":   resultToken,
-			"new_token": token,
-		})
-		return
 	}
 
 	ucase := usecase.NewBalancesUsecase()

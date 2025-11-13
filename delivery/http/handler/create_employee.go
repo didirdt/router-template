@@ -21,6 +21,7 @@ func CreateEmployeeHandler(ctx *gin.Context) {
 	}
 	if er != nil {
 		ctx.String(http.StatusBadRequest, "Failed Parse Params: "+er.Error())
+		return
 	}
 
 	ucase := usecase.NewEmployeeUsecase()
