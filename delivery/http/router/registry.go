@@ -17,6 +17,7 @@ package router
 import (
 	"net/http"
 	"router-template/delivery/http/handler"
+	"router-template/delivery/http/handler/bni"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,4 +40,10 @@ func RegisterHandler(router *gin.Engine) {
 	router.POST("/firebase_test", handler.TestFirebase)
 	router.POST("/pay_with_va", handler.PayWithVa)
 	router.POST("/pay_with_qris", handler.PayWithQris)
+
+	router.GET("/grcp/notes", handler.GetNotes)
+	router.GET("/grcp/products", handler.GetProducts)
+
+	router_bni := router.Group("/bni")
+	router_bni.POST("/token", bni.GetTokenBni)
 }

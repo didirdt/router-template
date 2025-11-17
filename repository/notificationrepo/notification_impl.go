@@ -61,14 +61,16 @@ func (e *notificationMysqlImpl) SendNotification(notification entities.SendNotif
 
 	ctx := context.Background()
 	rdb := keyvaluefactory.AppStore.GetStore().(*redis.Client)
-	key := fmt.Sprint("notif_go_", notification.Id, "_", time.Now().Unix())
-	err = rdb.Set(ctx, key, json_notification, 0).Err()
+	key := fmt.Sprint("notif_buffer_", notification.Id, "_", time.Now().Unix())
+	notif.Status = "success"
+
+	flatbufferData := notif.SerializeNotification()
+	err = rdb.Set(ctx, key, flatbufferData, 0).Err()
 	if err != nil {
 		notif.Status = "failed"
 		return notif, err
 	}
 
-	notif.Status = "success"
 	return notif, nil
 }
 
@@ -82,19 +84,21 @@ func (e *notificationMysqlImpl) ReceiveNotification(notification entities.SendNo
 	ctx := context.Background()
 	rdb := keyvaluefactory.AppStore.GetStore().(*redis.Client)
 
-	get_key := fmt.Sprint("notif_go_", employee.Id, "_*")
+	get_key := fmt.Sprint("notif_buffer_", employee.Id, "_*")
 	get_notifications := rdb.Keys(ctx, get_key)
 
 	for _, notif := range get_notifications.Val() {
+		notifA := entities.SendNotifResponse{}
 		get_value := rdb.Get(ctx, notif).Val()
-		err = json.Unmarshal([]byte(get_value), &notification)
+		bytesBuffer := []byte(get_value)
 
-		notifications = append(notifications, entities.SendNotifResponse{
-			Id:      notification.Id,
-			Name:    employee.Name,
-			Message: notification.Message,
-			Status:  "success",
-		})
+		// err = json.Unmarshal([]byte(get_value), &notification)
+		notifB, err := notifA.DeserializeNotification(bytesBuffer)
+		if err != nil {
+			return []entities.SendNotifResponse{}, errors.New(fmt.Sprint("error while Send notification : ", err.Error()))
+		}
+
+		notifications = append(notifications, notifB)
 	}
 	return notifications, err
 }

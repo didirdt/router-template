@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/didirdt/router-template/protos/notes";
+option ruby_package = "Notes";
+package notes;
+
+service Notes {
+    rpc GetNote(GetNoteReq) returns (GetNoteResp) { }
+}
+
+message GetNoteReq {
+    uint64 id = 1;
+}
+
+message GetNoteResp {
+    uint64 id = 1;
+    string title = 2;
+    string content = 3;
+}

@@ -48,15 +48,3 @@ type EmployeeBalance struct {
 	Balance float64 `json:"balance"`
 	Message string  `json:"message"`
 }
-
-type SendNotif struct {
-	Id      int64  `json:"id"`
-	Message string `json:"message"`
-}
-
-type SendNotifResponse struct {
-	Id      int64  `json:"id"`
-	Name    string `json:"name"`
-	Message string `json:"message"`
-	Status  string `json:"status"`
-}

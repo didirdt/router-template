@@ -1,0 +1,10 @@
+namespace Notification;
+
+table Notification {
+    id: int64;
+    name: string;
+    message: string;
+    status: string;
+}
+
+root_type Notification;
