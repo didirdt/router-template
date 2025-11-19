@@ -1,6 +1,8 @@
 package entities
 
-import "time"
+import (
+	"time"
+)
 
 type VirtualAccount struct {
 	PartnerServiceId      string `json:"partner_service_id"`
@@ -58,4 +60,16 @@ type CreateVaResponseQris struct {
 
 func (va *Qris) GetValidityPeriod() string {
 	return time.Now().Add(time.Hour * 24).Format("2006-01-02T15:04:05+07:00")
+}
+
+type BniToken struct {
+	ClientId     string `json:"clientId"`
+	ClientSecret string `json:"clientSecret"`
+	GrantType    string `json:"grantType"`
+	ApiKey       string `json:"apiKey"`
+	ApiSecret    string `json:"apiSecret"`
+	AppName      string `json:"appName"`
+	ClientId64   string `json:"clientId64"`
+	AccessToken  string `json:"access_token"`
+	AccountNo    string `json:"account_no"`
 }

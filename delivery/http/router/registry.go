@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"router-template/delivery/http/handler"
 	"router-template/delivery/http/handler/bni"
+	"router-template/delivery/http/handler/mutex"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,4 +47,9 @@ func RegisterHandler(router *gin.Engine) {
 
 	router_bni := router.Group("/bni")
 	router_bni.POST("/token", bni.GetTokenBni)
+	router_bni.POST("/balance", bni.GetBalance)
+
+	router_mutex := router.Group("/mutex")
+	router_mutex.GET("/mutex", mutex.GetMutex)
+
 }
