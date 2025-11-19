@@ -35,16 +35,22 @@ func (e *balanceMysqlImpl) TopupBalance(id int64, balance float64) (employee ent
 	return
 }
 
-func (b *balanceMysqlImpl) SendBalance(balances entities.SendBalance) (employeeBalance entities.EmployeeBalance, er error) {
+func (b *balanceMysqlImpl) SendBalance(balances entities.SendBalance, ch chan entities.EmployeeBalance) (employeeBalance entities.EmployeeBalance, er error) {
 	emprepo, _ := employeerepo.NewEmployeeRepo()
 	employee, er := emprepo.GetEmployeeById(balances.Id)
 	if er != nil {
-		return entities.EmployeeBalance{Id: balances.Id}, errors.New(fmt.Sprint("error while Process payment from employee : ", er.Error()))
+		message := fmt.Sprintf("error while Process payment send Balance : %s", er.Error())
+		ch <- entities.EmployeeBalance{Id: balances.ToId, Message: message}
+		return
+		// return entities.EmployeeBalance{Id: balances.Id}, errors.New(fmt.Sprint("error while Process payment from employee : ", er.Error()))
 	}
 
 	toEmployee, er := emprepo.GetEmployeeById(balances.ToId)
 	if er != nil {
-		return entities.EmployeeBalance{Id: balances.ToId}, errors.New(fmt.Sprint("error while Process payment to employee : ", er.Error()))
+		message := fmt.Sprintf("error while Process payment send Balance : %s", er.Error())
+		ch <- entities.EmployeeBalance{Id: balances.ToId, Message: message}
+		return
+		// return entities.EmployeeBalance{Id: balances.ToId}, errors.New(fmt.Sprint("error while Process payment to employee : ", er.Error()))
 	}
 
 	employeeBalance = entities.EmployeeBalance{
@@ -52,20 +58,40 @@ func (b *balanceMysqlImpl) SendBalance(balances entities.SendBalance) (employeeB
 		Name:    employee.Name,
 		Balance: employee.Balance,
 	}
-	endBalance := employee.Balance - balances.Balance
-	if endBalance < 0 {
-		return employeeBalance, errors.New("error while Process payment send Balance : balance not enough")
+
+	employeeBalance.Mutex.Lock()
+	employeeBalance.Balance = employee.Balance - balances.Balance
+	if employeeBalance.Balance < 0 {
+		employeeBalance.Message = fmt.Sprintf("error while Process payment send Balance : %v -  tidak cukup", employeeBalance.Balance)
+		ch <- employeeBalance
+		return
+		// return employeeBalance, errors.New("error while Process payment send Balance : balance not enough")
 	}
 
-	result, er := b.conn.Exec(`UPDATE employee SET balance=? WHERE id=?`, endBalance, employee.Id)
+	result, er := b.conn.Exec(`UPDATE employee SET balance=? WHERE id=?`, employeeBalance.Balance, employee.Id)
 	if result == nil || er != nil {
-		return employeeBalance, errors.New(fmt.Sprint("error while Process payment send Balance : ", er.Error()))
+		employeeBalance.Message = fmt.Sprint("error while Process payment send Balance : %s - %s"+er.Error(), result)
+		ch <- employeeBalance
+		return
+		// return employeeBalance, errors.New(fmt.Sprint("error while Process payment send Balance : ", er.Error()))
 	}
 
 	balance, er := b.TopupBalance(toEmployee.Id, balances.Balance)
 	if er != nil {
-		return employeeBalance, errors.New(fmt.Sprint("error while Process payment send Balance :", balance, er.Error()))
+		employeeBalance.Message = fmt.Sprint("error while Process payment send Balance : %s - %s"+er.Error(), balance)
+		ch <- employeeBalance
+		return
+		// return employeeBalance, errors.New(fmt.Sprint("error while Process payment send Balance :", balance, er.Error()))
 	}
+	// fmt.Printf("Reload balances: %+v\n", employeeBalance)
+	employeeBalance.Mutex.Unlock()
 
+	employeeBalance.Message = fmt.Sprint(
+		"success send to : ", toEmployee.Id,
+		" sebesar : ", balances.Balance,
+		" nilai awal balance : ", employee.Balance,
+		" nilai akhir balance : ", employeeBalance.Balance)
+
+	ch <- employeeBalance
 	return
 }

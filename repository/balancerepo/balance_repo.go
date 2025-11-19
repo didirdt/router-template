@@ -6,5 +6,5 @@ import (
 
 type BalanceRepo interface {
 	TopupBalance(id int64, balance float64) (entities.Employee, error)
-	SendBalance(balances entities.SendBalance) (entities.EmployeeBalance, error)
+	SendBalance(balances entities.SendBalance, ch chan entities.EmployeeBalance) (entities.EmployeeBalance, error)
 }
