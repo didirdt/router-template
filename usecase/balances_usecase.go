@@ -24,6 +24,8 @@ func (b *balancesUsecase) TopupBalance(id int64, balance float64) (employee enti
 }
 
 func (b *balancesUsecase) SendBalance(balances []entities.SendBalance) (employees []entities.EmployeeBalance, er error) {
+	ch := make(chan entities.EmployeeBalance, len(balances))
+
 	for _, balance := range balances {
 		emprepo, _ := balancerepo.NewBalanceRepo()
 		employee, er := emprepo.SendBalance(balance)

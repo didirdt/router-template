@@ -6,6 +6,7 @@ import (
 )
 
 type SafeCounter struct {
+	ch    chan int
 	mu    sync.Mutex
 	count int
 }
@@ -16,10 +17,20 @@ func (c *SafeCounter) Increment() {
 	c.count++
 }
 
-func (c *SafeCounter) Value() int {
+func (c *SafeCounter) CounterValue() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return c.count
+}
+func (c *SafeCounter) ChannelValue() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return <-c.ch
+}
+func (c *SafeCounter) Print() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.ChannelValue()
 }
 
 func main() {
@@ -35,5 +46,5 @@ func main() {
 	}
 
 	wg.Wait()
-	fmt.Println("Final count:", counter.Value()) // Always 100
+	fmt.Println("Final count:", counter.CounterValue()) // Always 100
 }
