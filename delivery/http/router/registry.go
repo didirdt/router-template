@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"router-template/delivery/http/handler"
 	"router-template/delivery/http/handler/bni"
-	"router-template/delivery/http/handler/mutex"
+	"router-template/delivery/http/handler/excel"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,7 +49,8 @@ func RegisterHandler(router *gin.Engine) {
 	router_bni.POST("/token", bni.GetTokenBni)
 	router_bni.POST("/balance", bni.GetBalance)
 
-	router_mutex := router.Group("/mutex")
-	router_mutex.GET("/mutex", mutex.GetMutex)
+	router.MaxMultipartMemory = 8 << 20
+	router_excel := router.Group("/excel")
+	router_excel.POST("/send_balance", excel.SendBalance)
 
 }

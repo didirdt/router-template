@@ -17,7 +17,7 @@ func newBalanceMysqlImpl() BalanceRepo {
 
 type balanceMysqlImpl struct {
 	conn *sql.DB
-	mu   sync.Mutex
+	mu   sync.RWMutex
 }
 
 func (e *balanceMysqlImpl) TopupBalance(id int64, balance float64) (employee entities.Employee, er error) {
@@ -102,80 +102,82 @@ func (b *balanceMysqlImpl) SendBalance(balances entities.SendBalance, ch chan *e
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	employeeBalance := &entities.EmployeeBalance{}
+	emrepo, _ := employeerepo.NewEmployeeRepo()
+	senderEmployee, _ := emrepo.GetEmployeeById(balances.Id)
 
-	// Start transaction
+	employeeBalance := &entities.EmployeeBalance{}
+	employeeBalance.Id = senderEmployee.Id
+	employeeBalance.Name = senderEmployee.Name
+
 	tx, err := b.conn.Begin()
 	if err != nil {
-		employeeBalance.Message = fmt.Sprintf("error starting transaction: %s", err.Error())
+		message := fmt.Sprintf("error starting transaction: %s", err.Error())
+		employeeBalance.Message = ErrorSendBalance(balances.Id, balances.ToId, balances.Balance, message)
 		ch <- employeeBalance
 		return
 	}
 	defer tx.Rollback()
 
-	// Lock sender row
 	var senderBalance float64
 	err = tx.QueryRow("SELECT balance FROM employee WHERE id = ? FOR UPDATE", balances.Id).Scan(&senderBalance)
 	if err != nil {
-		employeeBalance.Message = fmt.Sprintf("error locking sender: %s", err.Error())
+		message := fmt.Sprintf("error sender: %s", err.Error())
+		employeeBalance.Message = ErrorSendBalance(balances.Id, balances.ToId, balances.Balance, message)
 		ch <- employeeBalance
 		return
 	}
 
-	// Lock receiver row
 	var receiverBalance float64
 	err = tx.QueryRow("SELECT balance FROM employee WHERE id = ? FOR UPDATE", balances.ToId).Scan(&receiverBalance)
 	if err != nil {
-		employeeBalance.Message = fmt.Sprintf("error locking receiver: %s", err.Error())
+		message := fmt.Sprintf("error receiver: %s", err.Error())
+		employeeBalance.Message = ErrorSendBalance(balances.Id, balances.ToId, balances.Balance, message)
 		ch <- employeeBalance
 		return
 	}
 
-	// Check balance
 	if senderBalance < balances.Balance {
-		employeeBalance.Id = balances.Id
-		employeeBalance.Balance = senderBalance
-		employeeBalance.Message = fmt.Sprintf("insufficient balance: %.2f, needed: %.2f", senderBalance, balances.Balance)
+		message := fmt.Sprintf("Saldo kurang: %.2f, butuh: %.2f", senderBalance, balances.Balance)
+		employeeBalance.Message = ErrorSendBalance(balances.Id, balances.ToId, balances.Balance, message)
 		ch <- employeeBalance
 		return
 	}
 
-	// Update sender
 	newSenderBalance := senderBalance - balances.Balance
 	_, err = tx.Exec("UPDATE employee SET balance = ? WHERE id = ?", newSenderBalance, balances.Id)
 	if err != nil {
-		employeeBalance.Message = fmt.Sprintf("error updating sender: %s", err.Error())
+		message := fmt.Sprintf("error updating sender: %s", err.Error())
+		employeeBalance.Message = ErrorSendBalance(balances.Id, balances.ToId, balances.Balance, message)
 		ch <- employeeBalance
 		return
 	}
 
-	// Update receiver
 	newReceiverBalance := receiverBalance + balances.Balance
 	_, err = tx.Exec("UPDATE employee SET balance = ? WHERE id = ?", newReceiverBalance, balances.ToId)
 	if err != nil {
-		employeeBalance.Message = fmt.Sprintf("error updating receiver: %s", err.Error())
+		message := fmt.Sprintf("error updating receiver: %s", err.Error())
+		employeeBalance.Message = ErrorSendBalance(balances.Id, balances.ToId, balances.Balance, message)
 		ch <- employeeBalance
 		return
 	}
 
-	// Commit
 	if err := tx.Commit(); err != nil {
-		employeeBalance.Message = fmt.Sprintf("error committing: %s", err.Error())
+		message := fmt.Sprintf("error committing: %s", err.Error())
+		employeeBalance.Message = ErrorSendBalance(balances.Id, balances.ToId, balances.Balance, message)
 		ch <- employeeBalance
 		return
 	}
 
-	emrepo, _ := employeerepo.NewEmployeeRepo()
-	senderEmployee, _ := emrepo.GetEmployeeById(balances.Id)
-
-	employeeBalance.Id = senderEmployee.Id
-	employeeBalance.Name = senderEmployee.Name
 	employeeBalance.Balance = newSenderBalance
-
 	employeeBalance.Message = fmt.Sprint("Berhasil Kirim Balance ke ID : ", balances.ToId,
 		" sebesar : ", balances.Balance,
 		" nilai awal balance : ", senderBalance,
 		" nilai akhir balance : ", newSenderBalance)
 
 	ch <- employeeBalance
+}
+
+func ErrorSendBalance(id int64, toId int64, balance float64, message string) (serr string) {
+	serr = fmt.Sprintf("%s dari ID : %d, ke ID : %d, sebesar : %.2f", message, id, toId, balance)
+	return
 }

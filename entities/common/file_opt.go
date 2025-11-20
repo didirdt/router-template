@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func CopyFile(src, dst string) error {
@@ -36,4 +38,15 @@ func CopyAndDelete(src, dst string) error {
 		return fmt.Errorf("failed to delete file: %w", err)
 	}
 	return nil
+}
+
+func ParseCurrency(value string) (float64, error) {
+	cleaned := strings.ReplaceAll(value, "$", "")
+	cleaned = strings.ReplaceAll(cleaned, "€", "")
+	cleaned = strings.ReplaceAll(cleaned, "£", "")
+	cleaned = strings.ReplaceAll(cleaned, " ", "")
+	cleaned = strings.ReplaceAll(cleaned, ",", "")
+	cleaned = strings.ReplaceAll(cleaned, "Rp. ", "")
+
+	return strconv.ParseFloat(cleaned, 64)
 }

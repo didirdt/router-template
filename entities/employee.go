@@ -48,3 +48,12 @@ type EmployeeBalance struct {
 	Balance float64 `json:"balance"`
 	Message string  `json:"message"`
 }
+
+type ReportSendBalance struct {
+	TotalData           int     `json:"total_data"`
+	TotalNilaiTransaksi float64 `json:"total_nilai_transaksi"`
+	TotalSukses         int     `json:"total_sukses"`
+	TotalGagal          int     `json:"total_gagal"`
+	DataSukses          []EmployeeBalance
+	DataGagal           []EmployeeBalance
+}

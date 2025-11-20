@@ -20,6 +20,7 @@ require (
 	github.com/nyaruka/phonenumbers v1.6.6
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/redis/go-redis/v9 v9.7.0
+	github.com/xuri/excelize/v2 v2.10.0
 	google.golang.org/api v0.255.0
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
@@ -74,9 +75,14 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
+	github.com/richardlehane/mscfb v1.0.4 // indirect
+	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
+	github.com/tiendc/go-deepcopy v1.7.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
+	github.com/xuri/efp v0.0.1 // indirect
+	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
 	github.com/zeebo/errs v1.4.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.36.0 // indirect
