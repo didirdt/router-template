@@ -3,6 +3,7 @@ package usecase
 import (
 	"router-template/entities"
 	"router-template/repository/balancerepo"
+	"sync"
 )
 
 type BalancesUsecase interface {
@@ -24,26 +25,32 @@ func (b *balancesUsecase) TopupBalance(id int64, balance float64) (employee enti
 }
 
 func (b *balancesUsecase) SendBalance(balances []entities.SendBalance) (employees []*entities.EmployeeBalance, er error) {
-	ch := make(chan entities.EmployeeBalance, len(balances))
+	ch := make(chan *entities.EmployeeBalance, len(balances))
+	emprepo, _ := balancerepo.NewBalanceRepo()
+	var wg sync.WaitGroup
+	// var mu sync.Mutex
+
 	for _, balance := range balances {
-		emprepo, _ := balancerepo.NewBalanceRepo()
-		go emprepo.SendBalance(balance, ch)
-
-		// if er != nil {
-		// 	employee.Message = "error while Process payment send Balance : " + er.Error()
-		// }
-
-		// employees = append(employees, employee)
+		wg.Add(1)
+		go emprepo.SendBalance(balance, ch, &wg)
 	}
 
-	// for em := range ch {
-	// 	employees = append(employees, em)
-	// }
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
 
-	for {
-		em := <-ch
-		if em.Id != 0 {
-			employees = append(employees, &em)
+	for result := range ch {
+		if result.Id != 0 {
+			// mu.Lock()
+			employee := &entities.EmployeeBalance{
+				Id:      result.Id,
+				Name:    result.Name,
+				Balance: result.Balance,
+				Message: result.Message,
+			}
+			employees = append(employees, employee)
+			// mu.Unlock()
 		}
 
 		if len(employees) == len(balances) {
@@ -51,6 +58,5 @@ func (b *balancesUsecase) SendBalance(balances []entities.SendBalance) (employee
 		}
 	}
 
-	close(ch)
 	return employees, er
 }

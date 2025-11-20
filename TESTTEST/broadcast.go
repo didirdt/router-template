@@ -1,3 +1,6 @@
+//go:build ignore
+// +build ignore
+
 package main
 
 import (
@@ -6,10 +9,10 @@ import (
 	"sync"
 )
 
-// type BroadcastServer interface {
-// 	Subscribe() <-chan int
-// 	CancelSubscription(<-chan int)
-// }
+type BroadcastServer interface {
+	Subscribe() <-chan int
+	CancelSubscription(<-chan int)
+}
 
 type broadcastServer struct {
 	source         <-chan int

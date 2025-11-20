@@ -1,7 +1,5 @@
 package entities
 
-import "sync"
-
 type Employee struct {
 	Id          int64   `json:"id"`
 	Name        string  `json:"name"`
@@ -49,5 +47,4 @@ type EmployeeBalance struct {
 	Name    string  `json:"name"`
 	Balance float64 `json:"balance"`
 	Message string  `json:"message"`
-	Mutex   sync.RWMutex
 }

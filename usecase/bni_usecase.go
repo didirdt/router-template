@@ -26,10 +26,6 @@ func NewBniUsecase() BniUsecase {
 }
 
 type bniUsecase struct{}
-type bodyType struct {
-	AccountNo string `json:"accountNo"`
-	ClientId  string `json:"clientId"`
-}
 type bodyReq struct {
 	AccountNo string `json:"accountNo"`
 	ClientId  string `json:"clientId"`
