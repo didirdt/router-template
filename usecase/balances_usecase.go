@@ -10,7 +10,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/kpango/glg"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -61,7 +60,7 @@ func (b *balancesUsecase) SendBalance(balances []entities.SendBalance) (employee
 		employees = append(employees, employee)
 		// }
 
-		glg.Debug("ini ", len(employees), ": dari", len(balances), "==>", result.Id)
+		// glg.Debug("ini ", len(employees), ": dari", len(balances), "==>", result.Id)
 		if len(employees) == len(balances) {
 			break
 		}

@@ -6,7 +6,6 @@ import (
 	"router-template/usecase"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kpango/glg"
 )
 
 func SendBalance(ctx *gin.Context) {
@@ -17,8 +16,7 @@ func SendBalance(ctx *gin.Context) {
 	}
 
 	ucase := usecase.NewBalancesUsecase()
-	employee, report, er := ucase.SendBalanceExcel(file)
-	glg.Println(employee)
+	_, report, er := ucase.SendBalanceExcel(file)
 	if er != nil {
 		delivery.PrintError(er.Error())
 		ctx.String(http.StatusInternalServerError, "internal service error")
