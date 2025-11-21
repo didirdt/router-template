@@ -15,8 +15,8 @@ func Start() error {
 	//Discard semua output yang dicatat oleh gin karena print out akan dicetak sesuai kebutuhan programmer
 	gin.DefaultWriter = io.Discard
 
-	router := gin.Default() //create router engine by default
-	router.Use(gin.Recovery(), middleware.RequestLogger, middleware.ResponseLogger)
+	router := gin.Default()
+	router.Use(gin.Recovery(), middleware.RequestLogger, middleware.ResponseLogger, middleware.TimeoutMiddleware())
 
 	RegisterHandler(router)
 	listenerPort := os.Getenv("app.listener_port")
